@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Planner</title>
+    <style>
+        body {
+            display: flex;
+            height: 100vh;
+            justify-content: center;
+            align-items: center;
+            background-color: #f0f2f5;
+            font-family: Arial, sans-serif;
+            margin: 0;
+        }
+        .container {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            width: 100%;
+            max-width: 320px;
+        }
+        .input-field {
+            width: 90%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            align-items: center;
+        }
+        .btn {
+            width: 100%;
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .btn:hover {
+            background-color: #45a049;
+        }
+        .toggle-link {
+            margin-top: 10px;
+            cursor: pointer;
+            color: #4CAF50;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="auth-container">
+        <h2 id="form-title">Login</h2>
+        <form id="auth-form">
+            <input type="email" id="email" class="input-field" placeholder="Enter Email" required>
+            <input type="password" id="password" class="input-field" placeholder="Enter Password" required>
+            <button type="submit" class="btn">Submit</button>
+        </form>
+        <div class="toggle-link">
+            <a href="createAccount.html" style="text-decoration: none; color: #4CAF50;">Don't have an account? Register here.</a>
+        </div>
+    </div>
+
+    <script>
+        let isLogin = true; // Track whether we're in login mode
+
+        const authForm = document.getElementById('auth-form');
+        const formTitle = document.getElementById('form-title');
+        const toggleLink = document.querySelector('.toggle-link');
+        
+        // Handle form submission
+        authForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const storedUser = JSON.parse(localStorage.getItem('user'));
+
+            if (isLogin) {
+                if (storedUser && storedUser.email === email && storedUser.password === password) {
+                    alert('Login successful!');
+                    window.location.href = "homePage.html"; // Redirect to home page on success
+                } else {
+                    alert('Invalid email or password.');
+                }
+            } else {
+                const confirmPassword = document.getElementById('confirm-password').value;
+                if (password !== confirmPassword) {
+                    alert("Passwords do not match!");
+                    return;
+                }
+                alert(`Registering with Email: ${email}`);
+                const user = { email, password };
+                localStorage.setItem('user', JSON.stringify(user));
+                alert('Account created successfully!');
+                window.location.href = "mainLogin.html"; // Redirect to login after successful registration
+            }
+        });
+
+        // Toggle between login and registration
+        toggleLink.addEventListener('click', function() {
+            isLogin = !isLogin; // Toggle between login and register mode
+            formTitle.textContent = isLogin ? 'Login' : 'Register';
+            toggleLink.innerHTML = isLogin ? "Don't have an account? Register here." : "Already have an account? Login here.";
+
+            const confirmPasswordInput = document.getElementById('confirm-password');
+            if (!isLogin && !confirmPasswordInput) {
+                // Create a confirm password field if registering
+                const newConfirmPassword = document.createElement('input');
+                newConfirmPassword.type = 'password';
+                newConfirmPassword.id = 'confirm-password';
+                newConfirmPassword.classList.add('input-field');
+                newConfirmPassword.placeholder = 'Confirm Password';
+                authForm.insertBefore(newConfirmPassword, authForm.querySelector('.btn'));
+            } else if (isLogin && confirmPasswordInput) {
+                // Remove confirm password field when logging in
+                confirmPasswordInput.remove();
+            }
+        });
+    </script>
+</body>
+</html>
